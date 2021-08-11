@@ -1,0 +1,12 @@
+*.so
+*.o
+__pycache__
+train_log
+log_train_S3DIS*
+utils/nearest_neighbors/lib/python/KNN_NanoFLANN-0.0.0-py3.5.egg-info
+utils/nearest_neighbors/lib/python/KNN_NanoFLANN-0.0.0-py3.7.egg-info
+results
+utils/cpp_wrappers/cpp_subsampling/build
+utils/nearest_neighbors/build
+utils/nearest_neighbors/lib/python
+utils/nearest_neighbors/knn.cpp
