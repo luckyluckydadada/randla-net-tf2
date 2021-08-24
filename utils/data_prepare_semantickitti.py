@@ -2,6 +2,8 @@ import pickle, yaml, os, sys
 import numpy as np
 from os.path import join, exists, dirname, abspath
 from sklearn.neighbors import KDTree
+import getpass
+
 
 BASE_DIR = dirname(abspath(__file__))
 ROOT_DIR = dirname(BASE_DIR)
@@ -17,8 +19,8 @@ remap_lut = np.zeros((max_key + 100), dtype=np.int32)
 remap_lut[list(remap_dict.keys())] = list(remap_dict.values())
 
 grid_size = 0.06
-dataset_path = '/data/semantic_kitti/dataset/sequences'
-output_path = '/data/semantic_kitti/dataset/sequences' + '_' + str(grid_size)
+dataset_path = '/home/'+getpass.getuser()+'/data/semanticKITTI/dataset/sequences'
+output_path = '/home/'+getpass.getuser()+'/data/semanticKITTI/dataset/sequences' + '_' + str(grid_size)
 seq_list = np.sort(os.listdir(dataset_path))
 
 for seq_id in seq_list:

@@ -19,7 +19,7 @@
 #
 #          Imports and global variables
 #      \**********************************/
-#
+#https://github.com/HuguesTHOMAS/KPConv-PyTorch/blob/master/utils/ply.py
 
 
 # Basic libs

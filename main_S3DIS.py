@@ -9,12 +9,12 @@ import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 import numpy as np
 import time, pickle, argparse, glob, os
-
+import getpass
 
 class S3DIS:
     def __init__(self, test_area_idx):
         self.name = 'S3DIS'
-        self.path = '/data/S3DIS'
+        self.path = '/home/'+getpass.getuser()+'/data/S3DIS/'
         self.label_to_names = {0: 'ceiling',
                                1: 'floor',
                                2: 'wall',
@@ -49,7 +49,7 @@ class S3DIS:
 
     def load_sub_sampled_clouds(self, sub_grid_size):
         tree_path = join(self.path, 'input_{:.3f}'.format(sub_grid_size))
-        for i, file_path in enumerate(self.all_files):
+        for i, file_path in enumerate(self.all_files):  #all_files： Area1+Area23456共44+228个ply文件作为训练集
             t0 = time.time()
             cloud_name = file_path.split('/')[-1][:-4]
             if self.val_split in cloud_name:
@@ -72,7 +72,7 @@ class S3DIS:
             self.input_trees[cloud_split] += [search_tree]
             self.input_colors[cloud_split] += [sub_colors]
             self.input_labels[cloud_split] += [sub_labels]
-            self.input_names[cloud_split] += [cloud_name]
+            self.input_names[cloud_split] += [cloud_name]  # Area23456共228个ply文件作为训练集
 
             size = sub_colors.shape[0] * 4 * 7
             print('{:s} {:.1f} MB loaded in {:.1f}s'.format(kd_tree_file.split('/')[-1], size * 1e-6, time.time() - t0))
@@ -255,7 +255,7 @@ if __name__ == '__main__':
         tester.test(model, dataset)
     else:
         ##################
-        # Visualize data #
+        # Visualize data # 用的train 的bach
         ##################
 
         with tf.Session() as sess:
@@ -264,7 +264,7 @@ if __name__ == '__main__':
             while True:
                 flat_inputs = sess.run(dataset.flat_inputs)
                 pc_xyz = flat_inputs[0]
-                sub_pc_xyz = flat_inputs[1]
+                # sub_pc_xyz = flat_inputs[1]
                 labels = flat_inputs[21]
                 Plot.draw_pc_sem_ins(pc_xyz[0, :, :], labels[0, :])
-                Plot.draw_pc_sem_ins(sub_pc_xyz[0, :, :], labels[0, 0:np.shape(sub_pc_xyz)[1]])
+                # Plot.draw_pc_sem_ins(sub_pc_xyz[0, :, :], labels[0, 0:np.shape(sub_pc_xyz)[1]])

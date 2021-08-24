@@ -1,0 +1,56 @@
+Epoch   0, end. Min possibility = 6.8
+
+Confusion on sub clouds
+73.78 | 96.42 95.53 78.33 52.15 54.05 79.38 85.67 68.90 79.45 63.07 63.00 75.16 67.99 
+
+
+Reproject Vote #6
+Confusion on full clouds
+Area_1_office_16 Acc:0.9133100826162774
+Area_1_pantry_1 Acc:0.8539931233882941
+Area_1_office_10 Acc:0.8848825735639526
+Area_1_office_8 Acc:0.906682643981758
+Area_1_office_7 Acc:0.8659200049570902
+Area_1_office_27 Acc:0.8973680685775516
+Area_1_office_23 Acc:0.948404130472099
+Area_1_office_3 Acc:0.8837648752615122
+Area_1_office_18 Acc:0.9231578019542661
+Area_1_hallway_4 Acc:0.9282621667942769
+Area_1_office_14 Acc:0.863503616196437
+Area_1_hallway_2 Acc:0.958851260026963
+Area_1_hallway_6 Acc:0.8795059916722734
+Area_1_hallway_7 Acc:0.932667519368029
+Area_1_office_13 Acc:0.8949363055462991
+Area_1_office_25 Acc:0.9155218864864663
+Area_1_office_19 Acc:0.875587778450834
+Area_1_office_28 Acc:0.8950355714949487
+Area_1_hallway_5 Acc:0.9713171465406102
+Area_1_office_6 Acc:0.911840590768594
+Area_1_office_15 Acc:0.9030017587265627
+Area_1_office_29 Acc:0.9405782319011745
+Area_1_office_2 Acc:0.8805108386696827
+Area_1_office_11 Acc:0.8679188000227397
+Area_1_office_22 Acc:0.8681602600205087
+Area_1_office_31 Acc:0.8028189225081467
+Area_1_office_20 Acc:0.8806157291945779
+Area_1_office_26 Acc:0.8947548228053747
+Area_1_office_9 Acc:0.9354306399670694
+Area_1_office_17 Acc:0.9005419426768058
+Area_1_office_1 Acc:0.912091575277839
+Area_1_copyRoom_1 Acc:0.8325997310886214
+Area_1_office_21 Acc:0.896606542621509
+Area_1_hallway_1 Acc:0.9702700110724592
+Area_1_office_5 Acc:0.9185787885151593
+Area_1_hallway_8 Acc:0.8231234450373192
+Area_1_office_4 Acc:0.9016562583980651
+Area_1_conferenceRoom_1 Acc:0.9375207303779549
+Area_1_WC_1 Acc:0.9589193599255301
+Area_1_office_30 Acc:0.7911866409586183
+Area_1_hallway_3 Acc:0.9791404331142578
+Area_1_office_12 Acc:0.8927334184746449
+Area_1_office_24 Acc:0.9324184046748064
+Area_1_conferenceRoom_2 Acc:0.822207238899312
+--------------------------------------------------------------------------------------
+73.95 | 96.37 95.42 78.38 51.32 54.74 80.41 85.54 69.17 80.56 64.14 62.25 74.98 68.09 
+--------------------------------------------------------------------------------------
+

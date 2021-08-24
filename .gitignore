@@ -10,3 +10,4 @@ utils/cpp_wrappers/cpp_subsampling/build
 utils/nearest_neighbors/build
 utils/nearest_neighbors/lib/python
 utils/nearest_neighbors/knn.cpp
+test/Log*

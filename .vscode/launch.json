@@ -1,0 +1,36 @@
+{    
+    // 1 插件安装python
+    // 2 菜单栏 -》 Debug -》 Open Configurations
+    "version": "0.2.0",
+    "configurations": [
+    	// python debug
+        { 
+            "name": "main_S3DIS.py",
+            "type": "python",
+            "request": "launch",
+            "program": "main_S3DIS.py", // ${file} 表示当前文件
+            "console": "integratedTerminal",
+            //"cwd": "${fileDirname}", //  指定调试的目录为文件所在目录${fileDirname}，若注释此行则默认调试的目录为工程的根目录
+            "python": "/home/lucky/anaconda3/envs/randlanet/bin/python",  // conda环境
+            "args":[
+                "--mode",  // 参数不可以有空格，遇到空格则用“”新增一个参数
+                "vis",
+                "--test_area",
+                "1"
+            ]
+        },
+        {
+            "name": "Python: 当前文件",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "python": "/home/lucky/anaconda3/envs/randlanet/bin/python"   // conda环境
+        }
+
+
+        // c++ debug
+
+        
+    ]  
+}
