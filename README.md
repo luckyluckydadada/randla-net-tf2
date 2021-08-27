@@ -34,6 +34,7 @@ python utils/data_prepare_s3dis.py
         6 val要用的数据【proj_id、label 】 : pickle.load 
 ```
 ## 3 配置
+```
 ConfigS3DIS:
     k_n = 16  # KNN
     num_layers = 5  # Number of layers
@@ -56,13 +57,14 @@ ConfigS3DIS:
     train_sum_dir = 'train_log'
     saving = True
     saving_path = None
-
+```
 ## 3 train
+
+```
 python -B main_S3DIS.py --gpu 0 --mode train --test_area 1 表示:
 Area2-3-4-5-6共228个ply文件作为训练集
 Area1共44个ply文件作为验证集
 下面为6折交叉验证：
-```
 cat jobs_6_fold_cv_s3dis.sh 
 python -B main_S3DIS.py --gpu 0 --mode train --test_area 1  # Area23456作为训练集，area1作为验证集
 python -B main_S3DIS.py --gpu 0 --mode test --test_area 1
