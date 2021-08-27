@@ -3,12 +3,11 @@ fork from: https://github.com/QingyongHu/RandLA-Net.git
 
 ## 1 install
 ```
-Python 3.5, Tensorflow 2.0, CUDA 10.2 and cudnn
+Python 3.6, Tensorflow 2.6, CUDA 11.4 and cudnn ( /usr/local/cuda-11.4 没有用 conda 的cudatoolkit)
 git clone --depth=1 https://github.com/luckyluckydadada/randla-net-tf2.git
-conda create -n randlanet python=3.5  
+conda create -n randlanet python=3.6 
 conda activate randlanet
-conda install cudatoolkit=10.2.89 cudnn -c https://mirrors.ustc.edu.cn/anaconda/pkgs/main/ 
-pip install tensorflow-gpu==2.0 -i https://pypi.tuna.tsinghua.edu.cn/simple  --timeout=120
+pip install tensorflow-gpu==2.6 -i https://pypi.tuna.tsinghua.edu.cn/simple  --timeout=120
 pip install -r helper_requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  --timeout=120
 sh compile_op.sh
 ```
@@ -17,7 +16,7 @@ sh compile_op.sh
 ls /home/$USER/data/S3DIS/Stanford3dDataset_v1.2_Aligned_Version
 python utils/data_prepare_s3dis.py
 ```
-
+```
 1 Stanford3dDataset_v1.2_Aligned_Version/Area_1/office_16/office_16.txt 【x y z r g b】： pandas.read_csv
 2 Stanford3dDataset_v1.2_Aligned_Version/Area_1/office_16/Annotations 【label】：numpy 
   1+2=3
@@ -33,6 +32,7 @@ python utils/data_prepare_s3dis.py
     3.3 input_0.040/Area_1_office_16_KDTree_proj.pkl ：  pickle.dump
         --->
         6 val要用的数据【proj_id、label 】 : pickle.load 
+```
 ## 3 配置
 ConfigS3DIS:
     k_n = 16  # KNN
