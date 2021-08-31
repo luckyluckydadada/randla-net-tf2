@@ -58,7 +58,7 @@ ConfigS3DIS:
     saving = True
     saving_path = None
 ```
-## 3 train
+## 4 train
 
 ```
 python -B main_S3DIS.py --gpu 0 --mode train --test_area 1 表示:
@@ -80,11 +80,29 @@ python -B main_S3DIS.py --gpu 0 --mode train --test_area 6
 python -B main_S3DIS.py --gpu 0 --mode test --test_area 6
 
 ```
-### 4 vis
+## 5 vis
 label
 python  main_S3DIS.py --mode vis --test_area 1
 origin
-python o3d_plt_view.py 
+python vis_S3DIS.py 
+
+## 6 code
+helper_tf_util.py	封装了一些卷积池化操作代码
+helper_tool.py	  有训练时各个数据集所用到的一些参数信息，还有一些预处理数据时的一些模块。
+main_*.py	        训练对应数据的主文件
+RandLANet.py	    定义网络的主题结构
+tester_*.py	      测试对应数据的文件，该文件在main_*.py中被调用
+utils	            对数据集预处理的模块以及KNN模块。
+utils/data_prare_*.py 预处理，把point和label做了grid sampling，并且生成了一个kdtree保存下来
+
+
+## 7 NET
+将特征升维到8
+encoder：由4个（dilated_res_block+random_sample）构成，形成特征金字塔
+将金字塔尖的特征再次计算以下
+decoder：由4个（nearest_interpolation+conv2d_transpose）构成，恢复到point-wise的特征
+由point-wise经过一些MLP，得到f_out
+
 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/191111236/semantic-segmentation-on-semantic3d)](https://paperswithcode.com/sota/semantic-segmentation-on-semantic3d?p=191111236)
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/191111236/3d-semantic-segmentation-on-semantickitti)](https://paperswithcode.com/sota/3d-semantic-segmentation-on-semantickitti?p=191111236)
