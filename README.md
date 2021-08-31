@@ -1,5 +1,7 @@
 
 fork from: https://github.com/QingyongHu/RandLA-Net.git
+作者：https://zhuanlan.zhihu.com/p/105433460
+
 
 ## 1 install
 ```
@@ -16,23 +18,7 @@ sh compile_op.sh
 ls /home/$USER/data/S3DIS/Stanford3dDataset_v1.2_Aligned_Version
 python utils/data_prepare_s3dis.py
 ```
-```
-1 Stanford3dDataset_v1.2_Aligned_Version/Area_1/office_16/office_16.txt 【x y z r g b】： pandas.read_csv
-2 Stanford3dDataset_v1.2_Aligned_Version/Area_1/office_16/Annotations 【label】：numpy 
-  1+2=3
-3 original_ply/Area_1_office_16.ply 【 x y z r g b label】: numpy.tofile  # 采样后就不再使用了
-    ---> 随机采样，点数约为原来的0.04倍，rgb从0~255映射到0~1 
-    3 -> 3.1 3.2 3.3
-    3.1 input_0.040/Area_1_office_16.ply 【x y z r g b label】： numpy.tofile 
-        ---> 
-        4 train要用且只用数据【rgb和label 】: pickle.load 
-    3.2 input_0.040/Area_1_office_16_KDTree.pkl 【x y z】：pickle.dump
-        --->
-        5 train要用的数据 【x y z 】: pickle.load 
-    3.3 input_0.040/Area_1_office_16_KDTree_proj.pkl ：  pickle.dump
-        --->
-        6 val要用的数据【proj_id、label 】 : pickle.load 
-```
+
 ## 3 配置
 ```
 ConfigS3DIS:
@@ -80,6 +66,10 @@ python -B main_S3DIS.py --gpu 0 --mode train --test_area 6
 python -B main_S3DIS.py --gpu 0 --mode test --test_area 6
 
 ```
+
+论文里说，RandLA-Net是一个完全端到端的网络架构，能够将整个点云作为输入，而不用拆分、合并等预处理、后处理操作。但是我在阅读代码的时候，发现网络在获取数据的部分，采用的是和KPConv类似的思路：先随机选择一个train文件，在文件中随机选择一批中心点，然后在这些中心点周围用KNN的方法选择K个点，作为一个batch训练所需的点云。我看代码里确实是这样做的，感觉和论文里说的有点出入，不知道是不是我理解的有问题。
+对于 Semantic 3D 数据集，代码里先对原始点云进行 grid_size=0.01 的采样，得到点云1，然后对点云1进行 grid_size=0.06 的采样，得到点云2，最后对点云2进行学习。而最后test的时候，网络只把特征传播到点云1，意思就是语义分割的结果只预测到了点云1，并没有预测原始点云的分割结果，所以就对这里产生了一些疑问。S3DIS就没有这个问题，最后预测的是原始点云的语义分割结果。
+
 ## 5 vis
 label
 python  main_S3DIS.py --mode vis --test_area 1

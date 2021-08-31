@@ -33,12 +33,13 @@ class Network:
         with tf.variable_scope("inputs"):
             self.inputs = dict()
             num_layers = self.config.num_layers
+            #  flat_inputs[24=5 5 5 5 1 1 1 1]
             self.inputs["xyz"] = flat_inputs[:num_layers]
             self.inputs["neigh_idx"] = flat_inputs[num_layers : 2 * num_layers]
             self.inputs["sub_idx"] = flat_inputs[2 * num_layers : 3 * num_layers]
             self.inputs["interp_idx"] = flat_inputs[3 * num_layers : 4 * num_layers]
             self.inputs["features"] = flat_inputs[4 * num_layers]
-            self.inputs["labels"] = flat_inputs[4 * num_layers + 1]
+            self.inputs["labels"] = flat_inputs[4 * num_layers + 1]  # predict or label
             self.inputs["input_inds"] = flat_inputs[4 * num_layers + 2]
             self.inputs["cloud_inds"] = flat_inputs[4 * num_layers + 3]
 
@@ -121,49 +122,43 @@ class Network:
 
     def inference(self, inputs, is_training):
         """
-        NET:
-        将特征升维到8
-        encoder：由4个（dilated_res_block+random_sample）构成，形成特征金字塔
-        将金字塔尖的特征再次计算以下
-        decoder：由4个（nearest_interpolation+conv2d_transpose）构成，恢复到point-wise的特征
-        由point-wise经过一些MLP，得到f_out
+        NET: (以S3DIS为例说明)
+        0 将特征升维到8
+        1 encoder：由5个（dilated_res_block+random_sample）构成，形成特征金字塔
+        2 将金字塔尖的特征一次MLP
+        3 decoder：由5个（nearest_interpolation+conv2d_transpose）构成，恢复到point-wise的特征
+        4 由point-wise经过一些MLP，得到f_out
         """
 
-        d_out = self.config.d_out
-        # (?,?,6)
-        feature = inputs["features"]
-        # (?,?,8)
-        feature = tf.layers.dense(feature, 8, activation=None, name="fc0")
+        d_out = self.config.d_out  # [16, 64, 128, 256, 512]        
+        feature = inputs["features"]  # (?,?,6)  
+        feature = tf.layers.dense(feature, 8, activation=None, name="fc0") # (?,?,8) 将特征升维到8
         feature = tf.nn.leaky_relu(
             tf.layers.batch_normalization(feature, -1, 0.99, 1e-6, training=is_training)
         )
         # (?,?,1,8)
         feature = tf.expand_dims(feature, axis=2)
 
-        # ###########################Encoder############################
+        ########################### Encoder = (LFA + RS) x 5 ############################
         f_encoder_list = []
-        # config.num_layers：[16, 64, 128, 256, 512]
+        # config.num_layers：5 循环五次
         for i in range(self.config.num_layers):
-            # 扩张残差块:
-            # feacture：输入的数据
-            # xyz：博主的理解是 个点的xyz坐标F
-            # neigh_idx：k近邻点
-            # d_out：输出通道数
-            # is_training：是否训练
+            # 扩张残差块dilated_res_block 即 局部特征聚合模块Local feature aggregation 即 LFA
+            # 看论文的Local Feature Aggregation 那张图。
             f_encoder_i = self.dilated_res_block(
-                feature,
-                inputs["xyz"][i],
-                inputs["neigh_idx"][i],
-                d_out[i],
-                "Encoder_layer_" + str(i),
-                is_training,
+                feature,                    # 输入的数据
+                inputs["xyz"][i],           # 各个点的xyz坐标
+                inputs["neigh_idx"][i],     # k近邻点
+                d_out[i],                   # 输出通道数 d_out=[16, 64, 128, 256, 512]   
+                "Encoder_layer_" + str(i),  # 层的名字
+                is_training,                # 是否训练
             )
             f_sampled_i = self.random_sample(f_encoder_i, inputs["sub_idx"][i])
             feature = f_sampled_i
             if i == 0:
                 f_encoder_list.append(f_encoder_i)
             f_encoder_list.append(f_sampled_i)
-        # ###########################Encoder############################
+        ############################ 一次MLP ############################
 
         feature = helper_tf_util.conv2d(
             f_encoder_list[-1],
@@ -176,13 +171,15 @@ class Network:
             is_training,
         )
 
-        # ###########################Decoder############################
+        ############################ Decoder = (US + concatMLP) x 5  ############################
+        # US上采样方式：采用最近邻插值，三线性插值太慢了
+        # concatMLP: concat Encoder 对应层的feature后再做一次MLP
         f_decoder_list = []
         for j in range(self.config.num_layers):
-            f_interp_i = self.nearest_interpolation(
+            f_interp_i = self.nearest_interpolation(  # 上采样
                 feature, inputs["interp_idx"][-j - 1]
             )
-            f_decoder_i = helper_tf_util.conv2d_transpose(
+            f_decoder_i = helper_tf_util.conv2d_transpose(  # concatMLP
                 tf.concat([f_encoder_list[-j - 2], f_interp_i], axis=3),
                 f_encoder_list[-j - 2].get_shape()[-1].value,
                 [1, 1],
@@ -194,8 +191,9 @@ class Network:
             )
             feature = f_decoder_i
             f_decoder_list.append(f_decoder_i)
-        # ###########################Decoder############################
-
+        ########################### FC64 + FC32 + DP0.5 +FC13 ############################
+        # DP : drop out 概率 0.5
+        # FC13 ：S3DIS 13类
         f_layer_fc1 = helper_tf_util.conv2d(
             f_decoder_list[-1], 64, [1, 1], "fc1", [1, 1], "VALID", True, is_training
         )
@@ -386,7 +384,7 @@ class Network:
             True,
             is_training,
         )
-        f_pc = self.building_block(
+        f_pc = self.building_block( #Local Spatial Encoding + Attentive pooling
             xyz, f_pc, neigh_idx, d_out, name + "LFA", is_training
         )
         f_pc = helper_tf_util.conv2d(
@@ -415,7 +413,7 @@ class Network:
 
     def building_block(self, xyz, feature, neigh_idx, d_out, name, is_training):
         d_in = feature.get_shape()[-1].value
-        f_xyz = self.relative_pos_encoding(xyz, neigh_idx)
+        f_xyz = self.relative_pos_encoding(xyz, neigh_idx)  
         f_xyz = helper_tf_util.conv2d(
             f_xyz, d_in, [1, 1], name + "mlp1", [1, 1], "VALID", True, is_training
         )
