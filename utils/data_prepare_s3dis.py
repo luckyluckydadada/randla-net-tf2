@@ -74,7 +74,7 @@ def convert_pc2ply(anno_path, save_path):
         [sub_xyz, sub_colors, sub_labels],
         ["x", "y", "z", "red", "green", "blue", "class"],
     )
-    # 3.2 output3 存储KDTree 
+    # 3.2 output3 存储KDTree
     search_tree = KDTree(sub_xyz)
     kd_tree_file = join(
         sub_pc_folder, str(save_path.split("/")[-1][:-4]) + "_KDTree.pkl"

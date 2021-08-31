@@ -130,9 +130,11 @@ class Network:
         4 由point-wise经过一些MLP，得到f_out
         """
 
-        d_out = self.config.d_out  # [16, 64, 128, 256, 512]        
-        feature = inputs["features"]  # (?,?,6)  
-        feature = tf.layers.dense(feature, 8, activation=None, name="fc0") # (?,?,8) 将特征升维到8
+        d_out = self.config.d_out  # [16, 64, 128, 256, 512]
+        feature = inputs["features"]  # (?,?,6)
+        feature = tf.layers.dense(
+            feature, 8, activation=None, name="fc0"
+        )  # (?,?,8) 将特征升维到8
         feature = tf.nn.leaky_relu(
             tf.layers.batch_normalization(feature, -1, 0.99, 1e-6, training=is_training)
         )
@@ -146,12 +148,12 @@ class Network:
             # 扩张残差块dilated_res_block 即 局部特征聚合模块Local feature aggregation 即 LFA
             # 看论文的Local Feature Aggregation 那张图。
             f_encoder_i = self.dilated_res_block(
-                feature,                    # 输入的数据
-                inputs["xyz"][i],           # 各个点的xyz坐标
-                inputs["neigh_idx"][i],     # k近邻点
-                d_out[i],                   # 输出通道数 d_out=[16, 64, 128, 256, 512]   
+                feature,  # 输入的数据
+                inputs["xyz"][i],  # 各个点的xyz坐标
+                inputs["neigh_idx"][i],  # k近邻点
+                d_out[i],  # 输出通道数 d_out=[16, 64, 128, 256, 512]
                 "Encoder_layer_" + str(i),  # 层的名字
-                is_training,                # 是否训练
+                is_training,  # 是否训练
             )
             f_sampled_i = self.random_sample(f_encoder_i, inputs["sub_idx"][i])
             feature = f_sampled_i
@@ -384,7 +386,7 @@ class Network:
             True,
             is_training,
         )
-        f_pc = self.building_block( #Local Spatial Encoding + Attentive pooling
+        f_pc = self.building_block(  # Local Spatial Encoding + Attentive pooling
             xyz, f_pc, neigh_idx, d_out, name + "LFA", is_training
         )
         f_pc = helper_tf_util.conv2d(
@@ -413,7 +415,7 @@ class Network:
 
     def building_block(self, xyz, feature, neigh_idx, d_out, name, is_training):
         d_in = feature.get_shape()[-1].value
-        f_xyz = self.relative_pos_encoding(xyz, neigh_idx)  
+        f_xyz = self.relative_pos_encoding(xyz, neigh_idx)
         f_xyz = helper_tf_util.conv2d(
             f_xyz, d_in, [1, 1], name + "mlp1", [1, 1], "VALID", True, is_training
         )

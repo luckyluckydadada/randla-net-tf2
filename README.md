@@ -3,6 +3,7 @@ fork from: https://github.com/QingyongHu/RandLA-Net.git
 作者：https://zhuanlan.zhihu.com/p/105433460
 
 
+
 ## 1 install
 ```
 Python 3.6, Tensorflow 2.6, CUDA 11.4 and cudnn ( /usr/local/cuda-11.4 没有用 conda 的cudatoolkit)
